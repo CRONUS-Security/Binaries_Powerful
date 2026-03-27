@@ -1,0 +1,15 @@
+# 需要打包的 Impacket examples 脚本列表（每行一个）
+# 规则：
+# - 允许写文件名（例如 secretsdump.py）
+# - 允许写相对路径（例如 examples/secretsdump.py）
+# - 以 # 开头的行为注释，空行会忽略
+#
+# 如需恢复“全部打包”，可将此文件留空（仅保留注释），
+# 工作流会自动回退到 impacket/examples/*.py 全量构建。
+
+secretsdump.py
+psexec.py
+wmiexec.py
+smbexec.py
+atexec.py
+ntlmrelayx.py

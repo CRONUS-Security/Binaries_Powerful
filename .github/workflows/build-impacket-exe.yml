@@ -1,0 +1,56 @@
+name: Build Impacket Examples EXE
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+            - master
+
+jobs:
+    build:
+        runs-on: windows-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["3.9", "3.12"]
+                packager: ["pyinstaller", "nuitka"]
+
+        steps:
+            - name: Checkout current repository
+              uses: actions/checkout@v4
+
+            - name: Setup Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  cache: pip
+
+            - name: Clone impacket source
+              shell: pwsh
+              run: |
+                  git clone --depth 1 https://github.com/fortra/impacket.git
+
+            - name: Install dependencies
+              shell: pwsh
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install -r .\impacket\requirements.txt
+                  python -m pip install .\impacket
+                  python -m pip install pyinstaller nuitka ordered-set zstandard
+
+            - name: Build EXE files with ${{ matrix.packager }}
+              shell: pwsh
+              run: |
+                  .\script\build-impacket-examples.ps1 `
+                    -PythonVersion '${{ matrix.python-version }}' `
+                    -Packager '${{ matrix.packager }}' `
+                    -ImpacketRoot '.\impacket' `
+                    -ScriptListFile '.\script\impacket-examples.txt'
+
+            - name: Upload EXE artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: impacket-exes-py${{ matrix.python-version }}-${{ matrix.packager }}
+                  path: .\artifacts\*.exe
+                  if-no-files-found: error
