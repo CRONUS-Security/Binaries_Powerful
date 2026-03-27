@@ -55,5 +55,6 @@
 ## 注意事项
 
 - 推荐只在 `script/impacket-examples.txt` 中维护你关心的工具（每行一个脚本）。
+- `nuitka` 构建默认支持多线程编译，线程数由工作流环境变量 `NUITKA_JOBS` 控制（默认 `4`，可按 Runner 核数调整）。
 - 当 `script/impacket-examples.txt` 为空（仅注释/空行）时，会回退为全量打包 `impacket/examples/*.py`。
 - 如果某些工具脚本在特定版本/打包器下不兼容，工作流会在日志里列出失败脚本名。

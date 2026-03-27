@@ -11,9 +11,16 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$ScriptListFile = '.\\script\\impacket-examples.txt'
+,
+    [Parameter(Mandatory = $false)]
+    [int]$NuitkaJobs = 0
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($NuitkaJobs -le 0) {
+    $NuitkaJobs = [Math]::Max(1, [Environment]::ProcessorCount)
+}
 
 function Get-TargetScripts {
     param(
@@ -87,6 +94,7 @@ $targetScripts = Get-TargetScripts -ImpacketExamplesPath $examplesPath -ListFile
 Write-Host "Target scripts count: $($targetScripts.Count)"
 Write-Host 'Target scripts:'
 $targetScripts | ForEach-Object { Write-Host " - $($_.Name)" }
+Write-Host "Nuitka jobs: $NuitkaJobs"
 
 foreach ($script in $targetScripts) {
     $scriptPath = $script.FullName
@@ -117,6 +125,7 @@ foreach ($script in $targetScripts) {
             python -m nuitka `
                 --assume-yes-for-downloads `
                 --onefile `
+                --jobs=$NuitkaJobs `
                 --output-dir='.\\artifacts' `
                 --output-filename=$outputExeName `
                 $scriptPath

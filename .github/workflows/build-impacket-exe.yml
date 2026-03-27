@@ -11,6 +11,9 @@ on:
 permissions:
     contents: write
 
+env:
+  NUITKA_JOBS: "4"
+
 jobs:
     build:
         runs-on: windows-latest
@@ -50,7 +53,8 @@ jobs:
                     -PythonVersion '${{ matrix.python-version }}' `
                     -Packager '${{ matrix.packager }}' `
                     -ImpacketRoot '.\impacket' `
-                    -ScriptListFile '.\script\impacket-examples.txt'
+                    -ScriptListFile '.\script\impacket-examples.txt' `
+                    -NuitkaJobs $env:NUITKA_JOBS
 
             - name: Upload EXE artifacts
               uses: actions/upload-artifact@v4
