@@ -7,9 +7,9 @@
 # 如需恢复“全部打包”，可将此文件留空（仅保留注释），
 # 工作流会自动回退到 impacket/examples/*.py 全量构建。
 
-secretsdump.py
-psexec.py
-wmiexec.py
-smbexec.py
-atexec.py
-ntlmrelayx.py
+# secretsdump.py
+# psexec.py
+# wmiexec.py
+# smbexec.py
+# atexec.py
+# ntlmrelayx.py
