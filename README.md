@@ -46,6 +46,12 @@
 - `impacket-exes-py3.12-pyinstaller`
 - `impacket-exes-py3.12-nuitka`
 
+此外，工作流结束后会自动将所有 EXE 同步到固定 Release：
+
+- Tag: `impacket-latest`
+- Release 名称: `Impacket Latest Build`
+- 同名资源会被覆盖（始终保持最新一批构建结果）
+
 ## 注意事项
 
 - 推荐只在 `script/impacket-examples.txt` 中维护你关心的工具（每行一个脚本）。

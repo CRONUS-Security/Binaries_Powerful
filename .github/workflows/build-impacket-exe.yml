@@ -2,10 +2,14 @@ name: Build Impacket Examples EXE
 
 on:
     workflow_dispatch:
-    push:
-        branches:
-            - main
-            - master
+    # diable auto build
+    # push:
+    #     branches:
+    #         - main
+    #         - master
+
+permissions:
+    contents: write
 
 jobs:
     build:
@@ -54,3 +58,32 @@ jobs:
                   name: impacket-exes-py${{ matrix.python-version }}-${{ matrix.packager }}
                   path: .\artifacts\*.exe
                   if-no-files-found: error
+
+    publish-release:
+        name: Publish artifacts to Release
+        runs-on: ubuntu-latest
+        needs: build
+        if: ${{ always() && needs.build.result == 'success' }}
+
+        steps:
+            - name: Download all build artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  pattern: impacket-exes-*
+                  path: release-assets
+                  merge-multiple: true
+
+            - name: Update rolling Release assets
+              uses: ncipollo/release-action@v1
+              with:
+                  tag: impacket-latest
+                  name: Impacket Latest Build
+                  body: |
+                      Auto-updated by workflow run: ${{ github.run_id }}
+                      Source: fortra/impacket
+                  artifactErrorsFailBuild: true
+                  artifacts: release-assets/*.exe
+                  allowUpdates: true
+                  replacesArtifacts: true
+                  makeLatest: true
+                  token: ${{ secrets.GITHUB_TOKEN }}
