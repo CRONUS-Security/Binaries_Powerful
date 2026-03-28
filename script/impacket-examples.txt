@@ -7,9 +7,21 @@
 # 如需恢复“全部打包”，可将此文件留空（仅保留注释），
 # 工作流会自动回退到 impacket/examples/*.py 全量构建。
 
-# secretsdump.py
-# psexec.py
-# wmiexec.py
-# smbexec.py
-# atexec.py
-# ntlmrelayx.py
+GetADUsers.py
+GetLAPSPassword.py
+addcomputer.py
+atexec.py
+changepasswd.py
+exchanger.py
+getTGT.py
+mimikatz.py
+mssqlclient.py
+ntlmrelayx.py
+psexec.py
+regsecrets.py
+secretsdump.py
+smbclient.py
+smbexec.py
+smbserver.py
+wmiexec.py
+wmiquery.py
