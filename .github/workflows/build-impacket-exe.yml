@@ -53,6 +53,15 @@ jobs:
                   path: ~\AppData\Local\Nuitka\Nuitka\Cache\downloads\depends
                   key: nuitka-depends-x86_64
 
+            - name: Cache Nuitka bytecode
+              if: matrix.packager == 'nuitka'
+              uses: actions/cache@v4
+              with:
+                  path: ~\AppData\Local\Nuitka\Nuitka\Cache\bytecode
+                  key: nuitka-bytecode-py${{ matrix.python-version }}-${{ steps.impacket-sha.outputs.sha }}
+                  restore-keys: |
+                      nuitka-bytecode-py${{ matrix.python-version }}-
+
             - name: Build EXE files with ${{ matrix.packager }}
               shell: pwsh
               run: |
