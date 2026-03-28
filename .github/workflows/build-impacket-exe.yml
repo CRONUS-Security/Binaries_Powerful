@@ -46,6 +46,13 @@ jobs:
                   python -m pip install .\impacket
                   python -m pip install pyinstaller nuitka ordered-set zstandard
 
+            - name: Cache Nuitka depends.exe
+              if: matrix.packager == 'nuitka'
+              uses: actions/cache@v4
+              with:
+                  path: ~\AppData\Local\Nuitka\Nuitka\Cache\downloads\depends
+                  key: nuitka-depends-x86_64
+
             - name: Build EXE files with ${{ matrix.packager }}
               shell: pwsh
               run: |

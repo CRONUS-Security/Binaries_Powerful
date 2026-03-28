@@ -88,6 +88,40 @@ if (-not (Test-Path -Path $examplesPath -PathType Container)) {
 New-Item -ItemType Directory -Path '.\\artifacts' -Force | Out-Null
 New-Item -ItemType Directory -Path '.\\build' -Force | Out-Null
 
+# Pre-warm the Nuitka depends.exe cache to avoid a slow download at the start
+# of the first actual build. Nuitka looks for the file at:
+#   %LOCALAPPDATA%\Nuitka\Nuitka\Cache\downloads\depends\x86_64\depends.exe
+if ($Packager -eq 'nuitka') {
+    $dependsCacheDir = Join-Path $env:LOCALAPPDATA 'Nuitka\Nuitka\Cache\downloads\depends\x86_64'
+    $dependsExe      = Join-Path $dependsCacheDir 'depends.exe'
+
+    if (-not (Test-Path -Path $dependsExe -PathType Leaf)) {
+        Write-Host 'Pre-warming Nuitka depends.exe cache...'
+        New-Item -ItemType Directory -Path $dependsCacheDir -Force | Out-Null
+        $zipTemp = Join-Path ([System.IO.Path]::GetTempPath()) 'depends22_x64.zip'
+        try {
+            Invoke-WebRequest -Uri 'https://dependencywalker.com/depends22_x64.zip' `
+                              -OutFile $zipTemp -UseBasicParsing
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $zip = [System.IO.Compression.ZipFile]::OpenRead($zipTemp)
+            $entry = $zip.Entries | Where-Object { $_.Name -eq 'depends.exe' } | Select-Object -First 1
+            if ($entry) {
+                [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $dependsExe, $true)
+                Write-Host "Nuitka depends.exe cached to: $dependsExe"
+            } else {
+                Write-Warning 'depends.exe not found in downloaded zip; Nuitka will fall back to its own download.'
+            }
+            $zip.Dispose()
+        } catch {
+            Write-Warning "Failed to pre-warm depends.exe cache: $($_.Exception.Message). Nuitka will download it on first use."
+        } finally {
+            Remove-Item -Path $zipTemp -ErrorAction SilentlyContinue
+        }
+    } else {
+        Write-Host "Nuitka depends.exe cache already present: $dependsExe"
+    }
+}
+
 $failedScripts = New-Object System.Collections.Generic.List[string]
 $targetScripts = Get-TargetScripts -ImpacketExamplesPath $examplesPath -ListFilePath $ScriptListFile
 
